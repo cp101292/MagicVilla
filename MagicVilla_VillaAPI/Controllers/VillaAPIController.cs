@@ -1,5 +1,7 @@
 ﻿using MagicVilla_VillaAPI.Data;
+using MagicVilla_VillaAPI.Logging;
 using MagicVilla_VillaAPI.Model.Dto;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagicVilla_VillaAPI.Controllers
@@ -8,9 +10,19 @@ namespace MagicVilla_VillaAPI.Controllers
     [ApiController] // Provide build in support for the data annotation.
     public class VillaAPIController : Controller
     {
+        //private readonly ILogger<VillaAPIController> _logger;
+
+        //Using our own logger 
+        private readonly ILogging _logger;
+        public VillaAPIController(ILogging logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<VillaDto>> GetVillas()
         {
+            _logger.Log("Getting all villas", "information");
             return Ok(VillaStore.VillaList);
         }
 
@@ -22,12 +34,14 @@ namespace MagicVilla_VillaAPI.Controllers
         {
             if (id == 0)
             {
+                _logger.Log("GetVilla error with ID " +id, "error");
                 return BadRequest();
             }
 
             var villa = VillaStore.VillaList.FirstOrDefault(x => x.Id == id);
             if (villa == null)
             {
+                _logger.Log("villa not found", "error");
                 return NotFound();
             }
             return Ok(villa);
@@ -113,6 +127,28 @@ namespace MagicVilla_VillaAPI.Controllers
             return NoContent();
         }
 
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPatch("{id:int}", Name = "UpdatePartialVilla")]
+        public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaDto> patchDto)
+        {
+            if (patchDto == null || id == 0)
+            {
+                return BadRequest();
+            }
 
+            var villa = VillaStore.VillaList.FirstOrDefault(u => u.Id == id);
+            if (villa == null)
+            {
+                return BadRequest();
+            }
+
+            patchDto.ApplyTo(villa, ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            return NoContent();
+        }
     }
 }
