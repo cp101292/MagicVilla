@@ -1,4 +1,4 @@
-﻿using MagicVilla_VillaAPI.Model;
+﻿using MagicVilla_VillaAPI.Models;
 using System.Linq.Expressions;
 using MagicVilla_VillaAPI.Data;
 using Microsoft.EntityFrameworkCore;

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using AutoMapper;
-using MagicVilla_VillaAPI.Model;
-using MagicVilla_VillaAPI.Model.Dto;
+using MagicVilla_VillaAPI.Models;
+using MagicVilla_VillaAPI.Models.Dto;
 using MagicVilla_VillaAPI.Repository;
 using MagicVilla_VillaAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Http.HttpResults;
