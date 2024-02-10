@@ -1,4 +1,7 @@
+using MagicVilla_VillaAPI;
 using MagicVilla_VillaAPI.Data;
+using MagicVilla_VillaAPI.Repository;
+using MagicVilla_VillaAPI.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -14,6 +17,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
 });
+
+
+//Any number of mapping can reside inside the Mapping config file. 
+builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddTransient<IVillaRepository, VillaRepository>();
+builder.Services.AddTransient<IVillaNumberRepository, VillaNumberRepository>();
+
 // Add services to the container.
 // To enable support for the Application/XMl. 
 builder.Services.AddControllers
