@@ -30,11 +30,12 @@ namespace MagicVilla_VillaAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<APIResponse>> GetVillas()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> GetVillaNumbers()
         {
             try
             {
-                IEnumerable<VillaNumber> villaNumberList = await _dbVillaNumber.GetAllAsync();
+                IEnumerable<VillaNumber> villaNumberList = await _dbVillaNumber.GetAllAsync(includeProperty:"Villa");
                 _response.Result = _mapper.Map<List<VillaNumberDto>>(villaNumberList);
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
@@ -62,7 +63,7 @@ namespace MagicVilla_VillaAPI.Controllers
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var villaNumber = await _dbVillaNumber.GetAsync(x => x.VillaNo == id);
+                var villaNumber = await _dbVillaNumber.GetAsync(x => x.VillaNo == id, includeProperty: "Villa");
                 if (villaNumber == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
