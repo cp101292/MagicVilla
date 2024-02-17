@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using System.Text.Json.Serialization;
 using MagicVilla_Utility;
 using MagicVilla_Web.Models;
@@ -10,7 +11,7 @@ namespace MagicVilla_Web.Services
 {
     public class BaseService : IBaseService
     {
-        public APIResponse responseModel { get; set;}
+        public APIResponse responseModel { get; set; }
         private readonly IHttpClientFactory httpClient;
 
         public BaseService(IHttpClientFactory httpClient)
@@ -42,20 +43,38 @@ namespace MagicVilla_Web.Services
                     _ => HttpMethod.Get,
                 };
 
-                HttpResponseMessage apiResponse = null;
+                HttpResponseMessage apiResp = null;
 
-                apiResponse = await client.SendAsync(message);
+                apiResp = await client.SendAsync(message);
 
-                var apiContent = await apiResponse.Content.ReadAsStringAsync();
+                var apiContent = await apiResp.Content.ReadAsStringAsync();
+
+                try
+                {
+                    APIResponse apiResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent);
+                    if (apiResponse is { StatusCode: HttpStatusCode.BadRequest or HttpStatusCode.NotFound })
+                    {
+                        apiResponse.StatusCode = HttpStatusCode.BadRequest;
+                        apiResponse.IsSuccess = false;
+
+                        var res = JsonConvert.SerializeObject(apiResponse);
+                        var returnResponse = JsonConvert.DeserializeObject<T>(res);
+                        return returnResponse;
+                    }
+                }
+                catch (Exception e)
+                {
+                    var exceptionResponse = JsonConvert.DeserializeObject<T>(apiContent);
+                    return exceptionResponse;
+                }
                 var APIResponse = JsonConvert.DeserializeObject<T>(apiContent);
-
                 return APIResponse;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                var dto = new APIResponse()
+                var dto = new APIResponse
                 {
-                    ErrorMessages = new List<string> { Convert.ToString(ex.Message) },
+                    ErrorMessages = new List<string> { Convert.ToString(e.Message) },
                     IsSuccess = false
                 };
 
@@ -63,8 +82,6 @@ namespace MagicVilla_Web.Services
                 var APIResponse = JsonConvert.DeserializeObject<T>(res);
                 return APIResponse;
             }
-
         }
     }
 }
-    

@@ -1,0 +1,51 @@
+﻿<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/sweetalert2@11/theme-dark/dark.css">
+
+@if (TempData["success"] != null)
+{
+    <script type="text/javascript">
+        Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: '@TempData["success"]',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#1e2026',
+            customClass: {
+                title: 'title-class-success'
+            }
+        });
+    </script>
+    
+}
+
+@if (TempData["error"] != null)
+{
+    <script type="text/javascript">
+        Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: '@TempData["error"]',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#1e2026',
+            customClass: {
+                title: 'title-class-error'
+            }
+        });
+    </script>
+}
+
+<style type="text/css">
+    .title-class-success {
+        color: #36541c;
+        font-weight: bold;
+    }
+
+    .title-class-error {
+        color: #963e21;
+        font-weight: bold;
+    }
+</style>
