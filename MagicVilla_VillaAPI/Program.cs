@@ -4,6 +4,7 @@ using MagicVilla_VillaAPI.Data;
 using MagicVilla_VillaAPI.Repository;
 using MagicVilla_VillaAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -28,6 +29,21 @@ builder.Services.AddTransient<IVillaNumberRepository, VillaNumberRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 //Any number of mapping can reside inside the Mapping config file. 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+
+builder.Services.AddApiVersioning(
+    option=>
+    {
+        option.AssumeDefaultVersionWhenUnspecified = true;
+        option.DefaultApiVersion = new ApiVersion(1, 0);
+        option.ReportApiVersions = true;
+    });
+
+builder.Services.AddVersionedApiExplorer(
+    option =>
+    {
+        option.GroupNameFormat = "'v'VVV";
+        option.SubstituteApiVersionInUrl = true;
+    });
 
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
 
@@ -90,6 +106,43 @@ builder.Services.AddSwaggerGen(options => {
         }
         
     });
+    options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version   = "v1.0", 
+            Title = "Magic Villa v1",
+            Description = "API to manage villa = v1.0",
+            TermsOfService = new Uri("https://example.com/terms"),
+            Contact = new OpenApiContact
+            {
+                Name = "DotNetLearning",
+                Url = new Uri("https://mylearning.com")
+            },
+
+            License = new OpenApiLicense
+            {
+                Name = "Example license",
+                Url = new Uri("https://example.com/licence")
+            }
+    });
+
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2.0",
+        Title = "Magic Villa V2",
+        Description = "API to manage villa V2",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "DotNetLearning",
+            Url = new Uri("https://mylearning.com")
+        },
+
+        License = new OpenApiLicense
+        {
+            Name = "Example license",
+            Url = new Uri("https://example.com/licence")
+        }
+    });
 });
 
 
@@ -99,7 +152,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(
+        option =>
+        {
+            option.SwaggerEndpoint("/swagger/v1/swagger.json", "Magic_VillaV1");
+            option.SwaggerEndpoint("/swagger/v2/swagger.json", "Magic_VillaV2");
+        });
 }
 
 app.UseHttpsRedirection();

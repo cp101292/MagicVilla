@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MagicVilla_VillaAPI.Controllers
 {
-    [Route("api/UsersAuth")]
+    [Route("api/v{version:apiVersion}/UsersAuth")]
     [ApiController]
+    [ApiVersionNeutral]
     public class UsersController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -50,8 +51,8 @@ namespace MagicVilla_VillaAPI.Controllers
                 return BadRequest(_response);
             }
 
-            var registrationResponse =await _userRepository.Register(model);
-            if (registrationResponse ==  null)
+            var registrationResponse = await _userRepository.Register(model);
+            if (registrationResponse == null)
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.IsSuccess = false;
