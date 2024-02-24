@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using MagicVilla_Utility;
 using MagicVilla_Web.Models;
@@ -32,13 +33,17 @@ namespace MagicVilla_Web.Controllers
         public async Task<IActionResult> Login(LoginRequestDto obj)
         {
             APIResponse response  = await _authService.LoginAsync<APIResponse>(obj);
-            if (response != null && response.IsSuccess)
+            if (response is { IsSuccess: true, Result: { } })
             {
                 LoginResponseDto model =
                     JsonConvert.DeserializeObject<LoginResponseDto>(Convert.ToString(response.Result));
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(model.Token);
+
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-                identity.AddClaim(new Claim(ClaimTypes.Name , model.User.Name));
-                identity.AddClaim(new Claim(ClaimTypes.Role, model.User.Role));
+                identity.AddClaim(new Claim(ClaimTypes.Name , jwt.Claims.FirstOrDefault(u=> u.Type.Equals("unique_name")).Value));
+                identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u => u.Type.Equals("role")).Value));
 
                 var principle = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principle);
