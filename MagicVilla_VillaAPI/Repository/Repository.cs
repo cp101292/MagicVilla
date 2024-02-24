@@ -8,8 +8,9 @@ namespace MagicVilla_VillaAPI.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
+        private const int MaxPageSize = 100;
         private readonly ApplicationDbContext _db;
-        internal DbSet<T> _dbSet;
+        private readonly DbSet<T> _dbSet;
         public Repository(ApplicationDbContext db)
         {
             _db = db;
@@ -47,13 +48,22 @@ namespace MagicVilla_VillaAPI.Repository
         }
 
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string includeProperty = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string includeProperty = null, int pageSize = 0, int pageNumber = 1)
         {
             IQueryable<T> query = _dbSet;
 
             if (filter != null)
             {
                 query = query.Where(filter);
+            }
+
+            if (pageSize > 0)
+            {
+                if (pageSize > MaxPageSize)
+                {
+                    pageSize = MaxPageSize;
+                }
+                query = query.Skip(pageSize * (pageNumber - 1 )).Take(pageSize);
             }
 
             if (includeProperty == null) return await query.ToListAsync();

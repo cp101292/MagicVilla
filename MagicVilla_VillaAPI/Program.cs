@@ -29,6 +29,7 @@ builder.Services.AddTransient<IVillaNumberRepository, VillaNumberRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 //Any number of mapping can reside inside the Mapping config file. 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddResponseCaching();
 
 builder.Services.AddApiVersioning(
     option=>
@@ -67,10 +68,15 @@ builder.Services.AddAuthentication(x =>
 
 // Add services to the container.
 // To enable support for the Application/XMl. 
-builder.Services.AddControllers
-    (
-      //  option => option.ReturnHttpNotAcceptable = true
-    ).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+builder.Services.AddControllers(option =>
+{
+    option.CacheProfiles.Add("Default30",
+        new CacheProfile()
+        {
+            Duration = 30
+        });
+    //  option => option.ReturnHttpNotAcceptable = true
+}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 
 
 //builder.Services.AddControllers().AddNewtonsoftJson();

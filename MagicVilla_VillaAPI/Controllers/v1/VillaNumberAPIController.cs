@@ -64,17 +64,24 @@ namespace MagicVilla_VillaAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetVillaNumber(int id)
         {
+            var errorMsgList = new List<string>();
             try
             {
                 if (id == 0)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.IsSuccess = false;
+                    errorMsgList.Add("Id : 0");
+                    _response.ErrorMessages = errorMsgList;
                     return BadRequest(_response);
                 }
                 var villaNumber = await _dbVillaNumber.GetAsync(x => x.VillaNo == id, includeProperty: "Villa");
                 if (villaNumber == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
+                    errorMsgList.Add("Villa not found");
+                    _response.ErrorMessages = errorMsgList;
+                    _response.IsSuccess = false;
                     return NotFound(_response);
                 }
 
