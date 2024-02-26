@@ -1,9 +1,9 @@
 ﻿@using MagicVilla_Utility
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@inject IHttpContextAccessor httpAcc
+@inject IHttpContextAccessor HttpAcc
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,8 +34,8 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="VillaNumber" asp-action="IndexVillaNumber">Villa Number</a>
                         </li>
-                        @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                             httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+                        @if (HttpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
+                             HttpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
@@ -51,6 +51,12 @@
                             </li>
                         }
                     </ul>
+                    <div class="p-2 border rounded">
+                        <div class="form-check form-switch" id="btnSwitch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Mode</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -61,11 +67,21 @@
         </main>
     </div>
 
-    <footer class="footer text-muted">
-        <div class="container">
-            &copy; 2024 - MagicVilla_Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+<footer class="footer text-muted">
+    <div class="container">
+        &copy; 2024 - MagicVilla_Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>
+    <script type="text/javascript">
+        document.getElementById('btnSwitch').addEventListener('click',  () => {
+            if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'light')
+            } 
+            else {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            }
+        })
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
