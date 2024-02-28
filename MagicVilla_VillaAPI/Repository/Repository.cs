@@ -31,7 +31,7 @@ namespace MagicVilla_VillaAPI.Repository
 
             if (!tracked)
             {
-                query.AsNoTracking();
+                query = query.AsNoTracking();
             }
 
             if (filter != null)
