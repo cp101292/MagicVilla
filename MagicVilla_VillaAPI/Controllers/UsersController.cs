@@ -52,7 +52,7 @@ namespace MagicVilla_VillaAPI.Controllers
             }
 
             var registrationResponse = await _userRepository.Register(model);
-            if (registrationResponse == null)
+            if (registrationResponse is not { ID: { } })
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.IsSuccess = false;
